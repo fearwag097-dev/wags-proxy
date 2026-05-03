@@ -1,2 +1,0 @@
-# wags-proxy
-proxy

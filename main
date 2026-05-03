@@ -1,0 +1,27 @@
+/home/ubuntu/wag-proxy-backend/main.py
+from fastapi import FastAPI, Query
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
+import httpx
+ 
+app = FastAPI()
+ 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["GET"],
+    allow_headers=["*"],
+)
+ 
+@app.get("/proxy")
+async def proxy_search(url: str = Query(...)):
+    async with httpx.AsyncClient(follow_redirects=True, timeout=15.0) as client:
+        resp = await client.get(url, headers={
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        })
+        return HTMLResponse(content=resp.text, status_code=resp.status_code)
+ 
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
+    
